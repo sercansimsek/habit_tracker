@@ -1,11 +1,7 @@
 import { useState, type SubmitEvent } from "react";
 import { Button } from "./Button";
 
-type HabitFormProps = {
-  addHabit: (name: string) => void;
-};
-
-export default function HabitForm({ addHabit }: HabitFormProps) {
+export default function HabitForm() {
   const [name, setName] = useState("");
 
   function handleSubmit(e: SubmitEvent) {
@@ -13,8 +9,6 @@ export default function HabitForm({ addHabit }: HabitFormProps) {
 
     if (name.trim() === "") return;
     setName("");
-
-    addHabit(name);
   }
 
   return (

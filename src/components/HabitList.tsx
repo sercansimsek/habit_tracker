@@ -8,24 +8,11 @@ import {
   isSameDay,
   subDays,
 } from "date-fns";
+import { type Habit } from "../context/HabitProvider";
+import { useHabits } from "../context/useHabits";
 
-export type Habit = {
-  id: string;
-  name: string;
-  completions: Date[];
-};
-
-type HabitListProps = {
-  habits: Habit[];
-  deleteHabit: (id: string) => void;
-  toggleHabit: (id: string, date: Date) => void;
-};
-
-export default function HabitList({
-  habits,
-  deleteHabit,
-  toggleHabit,
-}: HabitListProps) {
+export default function HabitList() {
+  const { habits } = useHabits();
   if (habits.length === 0) {
     return (
       <p className="text-center text-zinc-500 py-12">
@@ -36,14 +23,7 @@ export default function HabitList({
   return (
     <div className="flex flex-col gap-3">
       {habits.map((habit) => {
-        return (
-          <HabitItem
-            key={habit.id}
-            habit={habit}
-            deleteHabit={deleteHabit}
-            toggleHabit={toggleHabit}
-          ></HabitItem>
-        );
+        return <HabitItem key={habit.id} habit={habit}></HabitItem>;
       })}
     </div>
   );
@@ -51,11 +31,11 @@ export default function HabitList({
 
 type HabitItemProps = {
   habit: Habit;
-  deleteHabit: (id: string) => void;
-  toggleHabit: (id: string, date: Date) => void;
 };
 
-function HabitItem({ habit, deleteHabit, toggleHabit }: HabitItemProps) {
+function HabitItem({ habit }: HabitItemProps) {
+  const habitContext = useHabits();
+
   const visibleDates = eachDayOfInterval({
     start: startOfWeek(new Date(), { weekStartsOn: 1 }),
     end: endOfWeek(new Date(), { weekStartsOn: 1 }),
@@ -72,7 +52,7 @@ function HabitItem({ habit, deleteHabit, toggleHabit }: HabitItemProps) {
           )}
         </div>
         <Button
-          onClick={() => deleteHabit(habit.id)}
+          onClick={() => habitContext.deleteHabit(habit.id)}
           variant="ghost-destructive"
           className="text-sm"
         >
@@ -85,7 +65,7 @@ function HabitItem({ habit, deleteHabit, toggleHabit }: HabitItemProps) {
             className="flex flex-1 flex-col items-center gap-0.5 rounded-lg text-xs"
             key={date.toISOString()}
             disabled={isFuture(date)}
-            onClick={() => toggleHabit(habit.id, date)}
+            onClick={() => habitContext.toggleHabit(habit.id, date)}
             variant={
               habit.completions.some((day) => isSameDay(date, day))
                 ? "primary"
